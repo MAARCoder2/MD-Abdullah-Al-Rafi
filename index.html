@@ -45,7 +45,7 @@
         <div class="panel-header">
           <div>
             <h2 class="panel-title" data-i18n="step1Title">Step 1: Load Requirements</h2>
-            <p class="panel-desc" data-i18n="step1Desc">Upload a valid requirements.json file to configure the tender parameters and document specifications.</p>
+            <p class="panel-desc" data-i18n="step1Desc">Upload requirements.json to configure tender parameters and required documents.</p>
           </div>
           <div class="action-buttons-group">
             <button id="loadBundledBtn" class="btn btn-secondary" type="button">
@@ -59,30 +59,29 @@
           </div>
         </div>
 
-        <div id="dropZone" class="drop-zone">
+        <div id="jsonDropZone" class="drop-zone">
           <input type="file" id="jsonFileInput" accept=".json,application/json" class="file-input-hidden">
           <div class="drop-zone-content">
             <div class="drop-icon-wrap">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path>
-                <path d="M12 12v9"></path>
-                <path d="m16 16-4-4-4 4"></path>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
               </svg>
             </div>
             <p class="drop-zone-text">
               <span class="drop-strong" data-i18n="dropTextPrompt">Click to choose</span> <span data-i18n="dropTextOr">or drag & drop</span> <code class="code-tag">requirements.json</code>
             </p>
-            <p class="drop-zone-hint" data-i18n="dropHint">Valid JSON containing tender metadata and requirement objects</p>
+            <p class="drop-zone-hint" data-i18n="dropHint">Valid JSON with tender details and requirements list</p>
           </div>
         </div>
 
-        <div id="loadAlert" class="alert-banner hidden">
-          <span id="alertIcon" class="alert-icon"></span>
-          <span id="alertMessage" class="alert-text"></span>
+        <div id="jsonAlert" class="alert-banner hidden">
+          <span id="jsonAlertIcon" class="alert-icon"></span>
+          <span id="jsonAlertMessage" class="alert-text"></span>
         </div>
       </section>
 
-      <!-- Section 2: Tender Details (shown when loaded) -->
+      <!-- Tender Details Section (shown when loaded) -->
       <section id="tenderDetailsSection" class="panel-card hidden">
         <div class="panel-header border-bottom">
           <div class="header-with-badge">
@@ -120,17 +119,62 @@
         </div>
       </section>
 
-      <!-- Section 3: Requirements List & Status (shown when loaded) -->
+      <!-- Section 2: PDF Upload Section -->
+      <section id="pdfUploadSection" class="panel-card hidden">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title" data-i18n="step2Title">Step 2: Upload Document PDFs</h2>
+            <p class="panel-desc" data-i18n="step2Desc">Upload PDF files for the tender. Non-PDF files will be rejected. Duplicates will be detected automatically.</p>
+          </div>
+          <div class="upload-stats">
+            <span id="uploadedCountBadge" class="badge badge-neutral">0 PDFs Uploaded</span>
+          </div>
+        </div>
+
+        <div id="pdfDropZone" class="drop-zone">
+          <input type="file" id="pdfFileInput" multiple accept=".pdf,application/pdf" class="file-input-hidden">
+          <div class="drop-zone-content">
+            <div class="drop-icon-wrap">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path>
+                <path d="M12 12v9"></path>
+                <path d="m16 16-4-4-4 4"></path>
+              </svg>
+            </div>
+            <p class="drop-zone-text">
+              <span class="drop-strong" data-i18n="dropPdfPrompt">Click to choose PDFs</span> <span data-i18n="dropTextOr">or drag & drop</span>
+            </p>
+            <p class="drop-zone-hint" data-i18n="dropPdfHint">You can select multiple PDF files at once (e.g. from the documents folder)</p>
+          </div>
+        </div>
+
+        <!-- Upload Notification / File Rejection Alert -->
+        <div id="pdfUploadAlert" class="alert-banner hidden">
+          <span id="pdfAlertIcon" class="alert-icon"></span>
+          <span id="pdfAlertMessage" class="alert-text"></span>
+        </div>
+
+        <!-- Uploaded Files List -->
+        <div id="uploadedFilesContainer" class="uploaded-files-container hidden">
+          <div class="uploaded-files-header">
+            <h3 class="subheading" data-i18n="uploadedFilesTitle">Uploaded PDF Files</h3>
+            <button id="clearAllPdfsBtn" class="btn btn-subtle-danger" type="button" data-i18n="clearAllBtn">Clear All Files</button>
+          </div>
+          <div id="uploadedFilesList" class="file-cards-grid">
+            <!-- Dynamically populated PDF file cards -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 3: Requirements List & Matching Matrix -->
       <section id="requirementsListSection" class="panel-card hidden">
         <div class="panel-header border-bottom">
           <div>
-            <h2 class="panel-title" data-i18n="reqListTitle">Required Documents Checklist</h2>
-            <p class="panel-desc" data-i18n="reqListDesc">Documents required for final package assembly, strictly sorted by sequence order.</p>
+            <h2 class="panel-title" data-i18n="step3Title">Step 3: Document Matching & Status</h2>
+            <p class="panel-desc" data-i18n="step3Desc">Match uploaded PDFs to required documents and enter expiry dates where required.</p>
           </div>
           <div class="summary-pill-group">
-            <span id="mandatoryCountPill" class="pill pill-mandatory"></span>
-            <span id="optionalCountPill" class="pill pill-optional"></span>
-            <span id="expiryCountPill" class="pill pill-expiry"></span>
+            <span id="statusSummaryPill" class="pill pill-summary"></span>
           </div>
         </div>
 
@@ -138,17 +182,50 @@
           <table class="data-table">
             <thead>
               <tr>
-                <th style="width: 80px;" data-i18n="thOrder">Order</th>
-                <th style="width: 90px;" data-i18n="thId">ID</th>
-                <th data-i18n="thTitle">Document Title</th>
-                <th style="width: 150px;" data-i18n="thRequirement">Requirement</th>
-                <th style="width: 190px;" data-i18n="thExpiryReq">Expiry Check</th>
+                <th style="width: 65px;" data-i18n="thOrder">Order</th>
+                <th style="width: 75px;" data-i18n="thId">ID</th>
+                <th style="min-width: 180px;" data-i18n="thTitle">Document Title</th>
+                <th style="width: 120px;" data-i18n="thRequirement">Requirement</th>
+                <th style="min-width: 220px;" data-i18n="thMatchedFile">Matched PDF File</th>
+                <th style="width: 160px;" data-i18n="thExpiryDate">Expiry Date</th>
+                <th style="width: 140px;" data-i18n="thStatus">Status</th>
               </tr>
             </thead>
             <tbody id="requirementsTableBody">
               <!-- Dynamically populated rows -->
             </tbody>
           </table>
+        </div>
+      </section>
+
+      <!-- Section 4: Package Generation & Download Panel -->
+      <section id="generationSection" class="panel-card hidden">
+        <div class="generation-card-content">
+          <div class="generation-info">
+            <h2 class="panel-title" data-i18n="step4Title">Step 4: Package Compilation & Download</h2>
+            <p id="blockingStatusText" class="generation-desc"></p>
+            <div id="blockingIssuesList" class="blocking-issues-box hidden">
+              <!-- List of blocking issues -->
+            </div>
+          </div>
+
+          <div class="generation-actions">
+            <button id="generateBtn" class="btn btn-primary btn-large" type="button" disabled>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              <span id="generateBtnText" data-i18n="generateBtnLabel">Generate Package PDF</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="generationProgress" class="progress-wrap hidden">
+          <div class="progress-bar-container">
+            <div id="progressBar" class="progress-bar-fill" style="width: 0%;"></div>
+          </div>
+          <p id="progressText" class="progress-text">Generating package...</p>
         </div>
       </section>
     </main>
@@ -159,6 +236,13 @@
     </footer>
   </div>
 
+  <!-- Local pdf-lib library with CDN fallback -->
+  <script src="pdf-lib.min.js"></script>
+  <script>
+    if (typeof PDFLib === 'undefined') {
+      document.write('<script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"><\/script>');
+    }
+  </script>
   <script src="app.js"></script>
 </body>
 </html>
